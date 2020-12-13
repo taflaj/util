@@ -2,8 +2,8 @@
 
 Sample usage:
 
-`in := reader.NewLineReader("sample.txt")`
-`for {
+```in := reader.NewLineReader("sample.txt")
+for {
     n, line, ok := in.ReadLine()
     if !ok {
         break
@@ -12,4 +12,4 @@ Sample usage:
     if line[0] == "^" {
         in.UnreadLine("caret")
     }
-}`
+}```
