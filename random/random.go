@@ -1,4 +1,4 @@
-// random.go
+// random/random.go
 // Package random implements multiple functions for generating random numbers and strings.
 // Based on schollz's gist:
 // https://gist.github.com/schollz/156d608e8ec26816cedaf06f14d7d692
