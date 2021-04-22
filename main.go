@@ -12,10 +12,7 @@ import (
 	"github.com/taflaj/util/server"
 )
 
-var (
-	myServer server.Server
-	setup    *server.Setup
-)
+var myServer server.Server
 
 func init() {
 	log.SetFlags(log.Flags() | log.Lmicroseconds)
@@ -41,11 +38,11 @@ func main() {
 	handlers = append(handlers, server.Handler{Pattern: "/", Handler: handler})
 	handlers = append(handlers, server.Handler{Pattern: "/exit", Handler: exit})
 	port := "8000"
-	myServer, setup = server.NewServer(":"+port, &handlers)
-	setup.OnStart = func() { log.Printf("%v listening on port %v", os.Getpid(), port) }
-	setup.OnExit = func() { log.Print("Server is exiting now") }
-	setup.OnFail = func(err error) { log.Print(err) }
-	setup.OnInterrupt = func(sig os.Signal) { log.Printf("Received %v", sig) }
+	myServer = server.NewServer(":"+port, &handlers)
+	myServer.SetOnStart(func() { log.Printf("%v listening on port %v", os.Getpid(), port) })
+	myServer.SetOnExit(func() { log.Print("Server is exiting now") })
+	myServer.SetOnFail(func(err error) { log.Print(err) })
+	myServer.SetOnInterrupt(func(sig os.Signal) { log.Printf("Received %v", sig) })
 	log.Printf("%#v", myServer)
 	myServer.Start()
 }
