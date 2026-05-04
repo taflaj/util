@@ -13,21 +13,21 @@ import (
 
 type Server interface {
 	GetServer() *http.Server
-	SetCloseTimeout(time.Duration)
-	SetOnExit(func())
-	SetOnFail(func(error))
-	SetOnInterrupt(func(os.Signal))
-	SetOnStart(func())
-	Start()
+	SetCloseTimeout(time.Duration) Server
+	SetOnExit(func()) Server
+	SetOnFail(func(error)) Server
+	SetOnInterrupt(func(os.Signal)) Server
+	SetOnStart(func()) Server
+	StartAndWait()
 	Stop()
 }
 
-type Handler struct {
-	Pattern string
-	Handler func(http.ResponseWriter, *http.Request)
+type ApiHandler struct {
+	Pattern     string
+	CallHandler http.Handler
 }
 
-type Handlers []Handler
+type Handlers []ApiHandler
 
 type setup struct {
 	server       *http.Server
@@ -41,14 +41,14 @@ type setup struct {
 func NewServer(address string, handlers *Handlers) Server {
 	mux := http.NewServeMux()
 	for _, handler := range *handlers {
-		mux.HandleFunc(handler.Pattern, handler.Handler)
+		mux.Handle(handler.Pattern, handler.CallHandler)
 	}
 	server := setup{}
 	server.server = &http.Server{Addr: address, Handler: mux}
 	return &server
 }
 
-func (server *setup) Start() {
+func (server *setup) StartAndWait() {
 	s := server.server
 	if s.IdleTimeout == 0 {
 		s.IdleTimeout = 60 * time.Second
@@ -96,22 +96,27 @@ func (server *setup) GetServer() *http.Server {
 	return server.server
 }
 
-func (server *setup) SetCloseTimeout(t time.Duration) {
+func (server *setup) SetCloseTimeout(t time.Duration) Server {
 	server.closeTimeout = t
+	return server
 }
 
-func (server *setup) SetOnStart(f func()) {
+func (server *setup) SetOnStart(f func()) Server {
 	server.onStart = f
+	return server
 }
 
-func (server *setup) SetOnExit(f func()) {
+func (server *setup) SetOnExit(f func()) Server {
 	server.onExit = f
+	return server
 }
 
-func (server *setup) SetOnFail(f func(error)) {
+func (server *setup) SetOnFail(f func(error)) Server {
 	server.onFail = f
+	return server
 }
 
-func (server *setup) SetOnInterrupt(f func(os.Signal)) {
+func (server *setup) SetOnInterrupt(f func(os.Signal)) Server {
 	server.onInterrupt = f
+	return server
 }

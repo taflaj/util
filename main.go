@@ -18,14 +18,18 @@ func init() {
 	log.SetFlags(log.Flags() | log.Lmicroseconds)
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+type genericHandler struct{}
+
+func (h *genericHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%#v", r)
-	fmt.Fprint(w, "Ok")
+	fmt.Fprintln(w, "Ok")
 }
 
-func exit(w http.ResponseWriter, r *http.Request) {
+type exitHandler struct{}
+
+func (h *exitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%#v", r)
-	fmt.Fprint(w, "Exiting")
+	fmt.Fprintln(w, "Exiting")
 	go func() {
 		time.Sleep(time.Second)
 		myServer.Stop()
@@ -35,14 +39,22 @@ func exit(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	var handlers server.Handlers
-	handlers = append(handlers, server.Handler{Pattern: "/", Handler: handler})
-	handlers = append(handlers, server.Handler{Pattern: "/exit", Handler: exit})
+	handlers = append(handlers, server.ApiHandler{Pattern: "/", CallHandler: &genericHandler{}})
+	handlers = append(handlers, server.ApiHandler{Pattern: "/exit", CallHandler: &exitHandler{}})
 	port := "8000"
-	myServer = server.NewServer(":"+port, &handlers)
-	myServer.SetOnStart(func() { log.Printf("%v listening on port %v", os.Getpid(), port) })
-	myServer.SetOnExit(func() { log.Print("Server is exiting now") })
-	myServer.SetOnFail(func(err error) { log.Print(err) })
-	myServer.SetOnInterrupt(func(sig os.Signal) { log.Printf("Received %v", sig) })
+	myServer = server.NewServer(":"+port, &handlers).
+		SetOnStart(func() {
+			log.Printf("%v listening on port %v", os.Getpid(), port)
+		}).
+		SetOnExit(func() {
+			log.Print("Server is exiting now")
+		}).
+		SetOnFail(func(err error) {
+			log.Print(err)
+		}).
+		SetOnInterrupt(func(sig os.Signal) {
+			log.Printf("Received %v", sig)
+		})
 	log.Printf("%#v", myServer)
-	myServer.Start()
+	myServer.StartAndWait()
 }

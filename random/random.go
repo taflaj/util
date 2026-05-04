@@ -36,7 +36,7 @@ func init() {
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue.
-func GenerateRandomBytes(length int) ([]byte, error) {
+func GenerateRandomBytes(length uint32) ([]byte, error) {
 	b := make([]byte, length)
 	if _, err := rand.Read(b); err != nil { // note that err == nil only if we read len(b) bytes
 		return nil, err
@@ -48,7 +48,7 @@ func GenerateRandomBytes(length int) ([]byte, error) {
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue.
-func GenerateRandomString(domain []byte, length int) (string, error) {
+func GenerateRandomString(domain []byte, length uint32) (string, error) {
 	bytes, err := GenerateRandomBytes(length)
 	if err != nil {
 		return "", err
@@ -66,7 +66,7 @@ func GenerateRandomString(domain []byte, length int) (string, error) {
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue.
-func Number(length int) (string, error) {
+func Number(length uint32) (string, error) {
 	return GenerateRandomString(number, length)
 }
 
@@ -74,7 +74,7 @@ func Number(length int) (string, error) {
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue.
-func Alpha(length int) (string, error) {
+func Alpha(length uint32) (string, error) {
 	return GenerateRandomString(alpha, length)
 }
 
@@ -82,7 +82,7 @@ func Alpha(length int) (string, error) {
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue.
-func AlphaNum(length int) (string, error) {
+func AlphaNum(length uint32) (string, error) {
 	return GenerateRandomString(alphanum, length)
 }
 
@@ -90,7 +90,7 @@ func AlphaNum(length int) (string, error) {
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue.
-func Special(length int) (string, error) {
+func Special(length uint32) (string, error) {
 	return GenerateRandomString(special, length)
 }
 
@@ -98,7 +98,7 @@ func Special(length int) (string, error) {
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue.
-func Any(length int) (string, error) {
+func Any(length uint32) (string, error) {
 	return GenerateRandomString(nil, length)
 }
 
@@ -118,7 +118,7 @@ func UInt() (uint, error) {
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue
-func Hex(length int) (string, error) {
+func Hex(length uint32) (string, error) {
 	r, err := GenerateRandomBytes(length/2 + 1)
 	if err != nil {
 		return "", err
