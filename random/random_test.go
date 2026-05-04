@@ -6,11 +6,11 @@ import (
 	"math/rand"
 	"strings"
 	"testing"
-	"time"
+	// "time"
 )
 
 func init() {
-	rand.Seed(time.Now().Unix())
+	// rand.Seed(time.Now().Unix())
 }
 
 func TestFibonacci(t *testing.T) {
@@ -51,14 +51,14 @@ func TestFibonacci(t *testing.T) {
 }
 
 func TestLength(t *testing.T) {
-	var lengths []int
+	var lengths []uint32
 	for i := 0; i < 25; i++ {
 		fib, _ := Fibonacci(i + 2)
-		lengths = append(lengths, fib)
+		lengths = append(lengths, uint32(fib))
 	}
 	tests := []struct {
 		name string
-		f    func(int) (string, error)
+		f    func(uint32) (string, error)
 	}{
 		{"Alpha", Alpha},
 		{"AlphaNum", AlphaNum},
@@ -73,7 +73,7 @@ func TestLength(t *testing.T) {
 				t.Error(err)
 			}
 			got := len(result)
-			if got != wanted {
+			if uint32(got) != wanted {
 				t.Errorf("len(%s(%v)) = %v, expected %v", test.name, wanted, got, wanted)
 			}
 		}
@@ -98,20 +98,20 @@ func TestDomain(t *testing.T) {
 	custom := "`~!@#$%^&*()_+=-[{}];:,<.>/?|\"\\"
 	tests := []struct {
 		domain string
-		f      func(int) (string, error)
+		f      func(uint32) (string, error)
 	}{
 		{number, Number},
 		{hex, Hex},
 		{alpha, Alpha},
 		{alphanum, AlphaNum},
-		{custom, func(length int) (string, error) {
+		{custom, func(length uint32) (string, error) {
 			return GenerateRandomString([]byte(custom), length)
 		}},
 	}
 	for _, test := range tests {
 		for i := 0; i < 10; i++ {
 			length := 100 + rand.Intn(900)
-			sample, _ := test.f(length)
+			sample, _ := test.f(uint32(length))
 			result := unique(sample)
 			for j := 0; j < len(result); j++ {
 				if strings.IndexByte(test.domain, result[j]) == -1 {
